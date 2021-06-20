@@ -4,10 +4,12 @@ if((parseFloat(version.substr(0, 2)) >= 15)){var saved_coord_system = app.coordi
 var pi= Math.PI; var tau = 2*pi;function cos(a){return Math.cos(a)};function sin(a){return Math.sin(a)};function acos(a){return Math.acos(a)};function asin(a){return Math.asin(a)};
 
 function Vec(a,b){this.v = [];this.v[0] = a;this.v[1] = b;}
-Vec.prototype.mul = function(b) {return Vec(this.v[0] * b.v[0],this.v[1] * b.v[1]) ;};
-Vec.prototype.div = function(b) {return Vec(this.v[0] / b.v[0],this.v[1] / b.v[1]) ;};
-Vec.prototype.add = function(b) {return Vec(this.v[0] + b.v[0],this.v[1] + b.v[1]) ;};
-Vec.prototype.sub = function(b) {return Vec(this.v[0] - b.v[0],this.v[1] - b.v[1]) ;};
+// function Vec(a){this.v = [a,a]}
+Vec.prototype.mul = function(b) {if(typeof b == "object")return new Vec(this.v[0] * b.v[0],this.v[1] * b.v[1]) else return new Vec(this.v[0]*b, this.v[1]*b);};
+Vec.prototype.div = function(b) {if(typeof b == "object")return new Vec(this.v[0] / b.v[0],this.v[1] / b.v[1]) else return new Vec(this.v[0]/b, this.v[1]/b);};
+Vec.prototype.add = function(b) {if(typeof b == "object")return new Vec(this.v[0] + b.v[0],this.v[1] + b.v[1]) else return new Vec(this.v[0]+b, this.v[1]+b);};
+Vec.prototype.sub = function(b) {if(typeof b == "object")return new Vec(this.v[0] - b.v[0],this.v[1] - b.v[1]) else return new Vec(this.v[0]-b, this.v[1]-b);};
+Vec.prototype.dot = function(b) {if(typeof b == "object")return (this.v[0] * b.v[0] + this.v[1] * b.v[1]) else return (this.v[0]*b + this.v[1]*b);};
 Vec.prototype.fromArr = function(a) {return Vec(a[0],a[1]) ;};
 Vec.prototype.x = function(){return this.v[0];};Vec.prototype.y = function(){return this.v[1];};
 Vec.prototype.rot = function(angle){
@@ -22,11 +24,13 @@ Vec.prototype.rot = function(angle){
 }
 
 function Vec3(a,b,c){this.v = [];this.v[0] = a;this.v[1] = b;this.v[2] = c;}
-Vec3.prototype.add = function(b) {return Vec3(this.v[0] + b.v[0],this.v[1] + b.v[1], this.v[2] + b.v[2]) ;};
-Vec3.prototype.mul = function(b) {return new Vec3(this.v[0] * b.v[0],this.v[1] * b.v[1], this.v[2] * b.v[2]) ;};
-Vec3.prototype.div = function(b) {return Vec3(this.v[0] / b.v[0],this.v[1] / b.v[1], this.v[2] / b.v[2]) ;};
-Vec3.prototype.sub = function(b) {return Vec3(this.v[0] - b.v[0],this.v[1] - b.v[1], this.v[2] - b.v[2]) ;};
-Vec3.prototype.fromArr = function(a) {return Vec3(a[0],arr[1],arr[2]) ;};
+// function Vec3(a){this.v = [a,a,a]}
+Vec3.prototype.add = function(b) {if(typeof b == "object")return new Vec3(this.v[0] + b.v[0],this.v[1] + b.v[1], this.v[2] + b.v[2]) else return new Vec3(this.x()+b,this.y()+b,this.z()+b);};
+Vec3.prototype.mul = function(b) {if(typeof b == "object")return new Vec3(this.v[0] * b.v[0],this.v[1] * b.v[1], this.v[2] * b.v[2]) else return new Vec3(this.x()*b,this.y()*b,this.z()*b);};
+Vec3.prototype.div = function(b) {if(typeof b == "object")return new Vec3(this.v[0] / b.v[0],this.v[1] / b.v[1], this.v[2] / b.v[2]) else return new Vec3(this.x()/b,this.y()/b,this.z()/b);};
+Vec3.prototype.sub = function(b) {if(typeof b == "object")return new Vec3(this.v[0] - b.v[0],this.v[1] - b.v[1], this.v[2] - b.v[2]) else return new Vec3(this.x()-b,this.y()-b,this.z()-b);};
+Vec3.prototype.dot = function(b) {if(typeof b == "object")return (this.v[0] * b.v[0] + this.v[1] * b.v[1] + this.v[2] * b.v[2]) else return this.x()*b+this.y()*b,this.z()*b;};
+Vec3.prototype.fromArr = function(a) {return Vec3(a[0],a[1],a[2]) ;};
 Vec3.prototype.x = function(){return this.v[0];};Vec3.prototype.y = function(){return this.v[1];};Vec3.prototype.z = function(){return this.v[2];};
 Vec3.prototype.rot = function(angle, axis){
     var idxa = 0; var idxb = 0;
@@ -42,3 +46,14 @@ Vec3.prototype.rot = function(angle, axis){
     newVec.v[idxa] = rotated.x(); newVec.v[idxb] =  rotated.y();
     return newVec;
  }
+
+function Shapes(){};
+Shapes.prototype.cross = function(pos,size){
+        return[
+            [pos.x() + size, pos.y() + size],
+            [pos.x() - size, pos.y() - size],
+            [0, 0],
+            [pos.x() + size, pos.y() - size],
+            [pos.x() - size, pos.y() + size],
+        ]
+};

@@ -1,4 +1,6 @@
 ﻿#include "libs.jsx"
+var shapes = Shapes();
+
 var doc = app.activeDocument;
 var lay = activeDocument.activeLayer;
 
@@ -10,7 +12,9 @@ var rY = doc.height;
 // strokeCap = StrokeCap.ROUNDEDCAP
 // setEntirePath, translate, resize
 
-generateSphere(0.4);
+// generatePerspGrid();
+generateGrid();
+
 
 function generateText(text) {
     var textFrame = doc.textFrames.add();
@@ -37,6 +41,105 @@ function generateCircle(rad) {
     c.setEntirePath(verts);
     c.resize(rX*40,rX*40);
     c.translate(activeDocument.width / 2, activeDocument.height / 2);
+}
+function generateGrid() {
+    this.getP = function(uv){
+        var p = new Vec3( uv.x(), uv.y(), 0);
+        p.v[2] = p.v[2] + sin(uv.dot(uv)*4.)*0.4;
+        // p = p.rot(1.4,'y');
+        p = p.rot(.3,'x');            
+        return p;
+    }
+    const group = lay.groupItems.add();
+    var verts = [];
+    const itersi = 40;
+    const itersj = 40;
+    const stepSz = new Vec(1/itersi, 1/itersj);
+    for(i = 0; i < itersi; i++){
+        for(j = 0; j < itersj; j++){ 
+            
+            var uv = new Vec(i/itersi*2. - 1., j/itersj*2. - 1.);
+            var p = this.getP(uv);
+            // var nextP = this.getP(uv.add(stepSz));
+            // var nextPx = this.getP(uv.add(new Vec(stepSz.x(),0)));
+            // var nextPy = this.getP(uv.add(new Vec(0,stepSz.y())));
+
+            var zoffs = 2;
+            var zdiv = 0.4;
+            p = p.div( (p.z() + zoffs)/zdiv);
+            p = p.mul(rX*0.8);
+                        
+            var c = group.pathItems.add();
+            c.stroked = true;
+            c.filled = false;
+            c.closed = false;
+            c.strokeCap = StrokeCap.ROUNDENDCAP;
+            c.strokeWidth = 3;
+                
+            // c.setEntirePath([ [p.x(),p.y()], [p.x(),p.y()], ]);
+            c.setEntirePath([ 
+                ...shapes.cross(
+                    new Vec(p.x(),p.y()), stepSz.x()
+                    )
+                ]);
+            c.translate(rX / 4, rY / 4);
+            c.translate(rX / 4, rY / 4);
+            
+        }
+    }
+    //c.setEntirePath(verts);
+}
+
+
+function generatePerspGrid() {
+    this.getP = function(uv){
+        var p = new Vec3( uv.x(), 0, uv.y());
+        p.v[1] = p.v[1] + sin(uv.dot(uv)*4.)*0.4;
+
+        p = p.rot(1.4,'y');
+        p = p.rot(.3,'x');            
+        return p;
+    }
+    const group = lay.groupItems.add();
+    var verts = [];
+    const itersi = 40;
+    const itersj = 40;
+    const stepSz = new Vec(1/itersi, 1/itersj);
+    for(i = 0; i < itersi; i++){
+        for(j = 0; j < itersj; j++){ 
+            
+            var uv = new Vec(i/itersi*2. - 1., j/itersj*2. - 1.);
+            var p = this.getP(uv);
+            // var nextP = this.getP(uv.add(stepSz));
+            // var nextPx = this.getP(uv.add(new Vec(stepSz.x(),0)));
+            // var nextPy = this.getP(uv.add(new Vec(0,stepSz.y())));
+
+            const zoffs = 2;
+            const zdiv = 0.4;
+            p = p.div( (p.z() + zoffs)/zdiv);
+
+            p = p.mul(rX*0.8);
+                        
+            var c = group.pathItems.add();
+            c.stroked = true;
+            c.filled = false;
+            c.closed = false;
+            c.strokeCap = StrokeCap.ROUNDENDCAP;
+            
+            c.strokeWidth = 3;
+                
+            // c.setEntirePath([[p.x(),p.y()],[p.x(),p.y()]]);
+            c.setEntirePath([
+                [p.x(),p.y()],
+                [p.x(),p.y()],
+                // [nextPx.x(),nextPx.y()],
+                ]);
+            c.translate(rX / 4, rY / 4);
+            c.translate(rX / 4, rY / 4);
+            
+        }
+    }
+    //c.setEntirePath(verts);
 }
 function generateSphere(rad) {
     var group = lay.groupItems.add();
