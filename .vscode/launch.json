@@ -8,7 +8,7 @@
       "type": "extendscript-debug",
       "request": "launch",
       "name": "Ask for script name",
-      "program": "${workspaceFolder}/test.jsx",
+      "program": "${workspaceFolder}/main.js",
       "stopOnEntry": false
     }
   ]

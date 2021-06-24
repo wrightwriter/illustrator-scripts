@@ -1,0 +1,9 @@
+{
+  "compilerOptions":{
+    "module":"none",
+    "noLib":true,
+    "types": [
+      "types-for-adobe/illustrator/2015.3"
+    ]
+  }
+}
